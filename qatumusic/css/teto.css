@@ -21,7 +21,6 @@ body {
   pointer-events: none;
 }
 
-/* Nav */
 .nav {
   position: fixed;
   top: 0;
@@ -54,7 +53,6 @@ body {
   transform: scale(1.2);
 }
 
-/* Header */
 .header-top {
   margin-top: 120px;
   display: flex;
@@ -73,14 +71,12 @@ body {
   color: #00ffe1;
 }
 
-/* Subtitle */
 .sub-title {
   font-size: 1.5em;
   color: #bbbbbb;
   margin: 15px 0 40px;
 }
 
-/* Player card */
 .player-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
@@ -96,7 +92,6 @@ body {
   box-shadow: 0 0 40px rgba(0, 255, 225, 0.1);
 }
 
-/* Input */
 #search {
   margin-top: 10px;
   padding: 0.8em 1em;
@@ -117,7 +112,6 @@ body {
   border-color: #66fff3;
 }
 
-/* Results */
 #results {
   margin-top: 20px;
   max-height: 300px;
@@ -143,7 +137,6 @@ body {
   border-radius: 6px;
 }
 
-/* Now Playing */
 #nowPlaying {
   text-align: center;
   margin: 15px 0;
@@ -151,7 +144,6 @@ body {
   color: #00ffe1;
 }
 
-/* Play/Pause */
 #playPauseBtn {
   display: none;
   font-size: 40px;
