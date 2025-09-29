@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>qatuMusic</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="teto.css" />
+</head>
+<body>
+  <div id="particles-js"></div>
+
+
+
+  <div class="header-top fade-in-up">
+    <img src="cryptora-logo.png" alt="Logo" class="ce-img" />
+  </div>
+
+  <div class="player-card fade-in-up" 
+       data-tilt
+       data-tilt-max="10"
+       data-tilt-speed="400"
+       data-tilt-scale="1"
+       data-tilt-perspective="2000"
+       data-tilt-glare="false">
+    <input type="text" id="search" placeholder="Search for a song..." />
+    <div id="results"></div>
+    <div id="nowPlaying">Nothing playing right now...</div>
+    <button id="playPauseBtn" class="material-symbols-outlined">play_arrow</button>
+  </div>
+
+  <audio id="audio"></audio>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <script src="vanilla-tilt.js"></script>
+  <script>
+    let vantaEffect = null;
+    const initVanta = () => {
+      if (window.VANTA && !vantaEffect) {
+        vantaEffect = window.VANTA.GLOBE({
+          el: '#particles-js',
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          color: 0x00ffe1,
+          backgroundColor: 0x0f0f0f
+        });
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const maxAttempts = 20;
+      let attempts = 0;
+      const tryInit = () => {
+        attempts++;
+        if (window.VANTA) return initVanta();
+        if (attempts < maxAttempts) setTimeout(tryInit, 200);
+      };
+      tryInit();
+    });
+
+    const searchInput = document.getElementById('search');
+    const resultsDiv = document.getElementById('results');
+    const nowPlayingDiv = document.getElementById('nowPlaying');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const audio = document.getElementById('audio');
+    let currentTrack = null;
+
+    function searchSongs(query) {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'deezerCallback_' + Math.floor(Math.random() * 1000000);
+        window[callbackName] = function(data) {
+          resolve(data.data);
+          document.body.removeChild(script);
+          delete window[callbackName];
+        };
+        const script = document.createElement('script');
+        script.src = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=${callbackName}`;
+        script.onerror = () => reject('Failed to fetch');
+        document.body.appendChild(script);
+      });
+    }
+
+    searchInput.addEventListener('keypress', async (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value.trim();
+        if (!query) return;
+        resultsDiv.innerHTML = 'hold the fuck up im loading';
+        try {
+          const tracks = await searchSongs(query);
+          resultsDiv.innerHTML = '';
+          tracks.forEach(track => {
+            const div = document.createElement('div');
+            div.innerHTML = `<img src="${track.album.cover_small}" /> ${track.artist.name} - ${track.title}`;
+            div.addEventListener('click', () => playTrack(track));
+            resultsDiv.appendChild(div);
+          });
+        } catch (err) {
+          resultsDiv.innerHTML = 'Error fetching songs.';
+          console.error(err);
+        }
+      }
+    });
+
+    function playTrack(track) {
+      currentTrack = track;
+      audio.src = track.preview;
+      audio.play();
+      nowPlayingDiv.textContent = `${track.artist.name} - ${track.title}`;
+      playPauseBtn.style.display = 'block';
+      playPauseBtn.textContent = 'pause';
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (!currentTrack) return;
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = 'pause';
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = 'play_arrow';
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      playPauseBtn.textContent = 'play_arrow';
+    });
+  </script>
+</body>
+</html>
